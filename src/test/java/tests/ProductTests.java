@@ -3,6 +3,8 @@ package tests;
 import com.github.javafaker.Faker;
 import data.Category;
 import data.Product;
+import db.dao.CategoriesMapper;
+import db.dao.ProductsMapper;
 import enums.CategoryType;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,6 +14,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import service.CategoryService;
 import service.ProductService;
+import utilities.DBUtils;
 import utilities.PrettyLogger;
 import utilities.RetrofitUtils;
 
@@ -25,16 +28,21 @@ public class ProductTests {
     static Retrofit client;
     static ProductService productService;
     static CategoryService categoryService;
+    static CategoriesMapper categoriesMapper;
     Faker faker = new Faker();
     Product product;
     Product product2;
     PrettyLogger prettyLogger = new PrettyLogger();
+    static ProductsMapper productsMapper;
+
 
     @BeforeAll
     static void beforeAll() {
         client = RetrofitUtils.getRetrofit();
         productService = client.create(ProductService.class);
         categoryService = client.create(CategoryService.class);
+        productsMapper = DBUtils.getProductsMapper();
+        categoriesMapper = DBUtils.getCategoriesMapper();
     }
 
     @BeforeEach
@@ -52,8 +60,11 @@ public class ProductTests {
 
     @Test
     Integer postProductTest() throws IOException {
+        Integer countProductBefore = DBUtils.countProducts(productsMapper);
         Response<Product> response = productService.createProduct(product).execute();
+        Integer countProductAfter = DBUtils.countProducts(productsMapper);
         prettyLogger.log(response.body().toString());
+        assertThat(countProductAfter, equalTo(countProductBefore + 1));
         assertThat(response.body().getTitle(), equalTo(product.getTitle()));
         assertThat(response.body().getCategoryTitle(), equalTo(product.getCategoryTitle()));
         assertThat(response.body().getPrice(), equalTo(product.getPrice()));
@@ -62,18 +73,25 @@ public class ProductTests {
 
     @Test
     void postNoInfoProductTest() throws IOException {
+        Integer countProducts = DBUtils.countProducts(productsMapper);
         Response<Product> response = productService.createProduct(product2).execute();
+        Integer countProductAfter = DBUtils.countProducts(productsMapper);
+        assertThat(countProductAfter, equalTo(countProducts));
         assertThat(response.body(), equalTo(null));
         assertThat(response.isSuccessful(), is(false));
     }
 
     @Test
     void getCategoryByIdTest() throws IOException {
+        Integer countCategories = DBUtils.countCategories(categoriesMapper);
+        DBUtils.createNewCategory(categoriesMapper);
         Integer id = CategoryType.FOOD.getId();
         Response<Category> response = categoryService
                 .getCategory(id)
                 .execute();
         prettyLogger.log(response.body().toString());
+        Integer countCategoriesAfter = DBUtils.countCategories(categoriesMapper);
+        assertThat(countCategoriesAfter, equalTo(countCategories + 1));
         assertThat(response.body().getId(), equalTo(id));
         assertThat(response.body().getTitle(), equalTo(CategoryType.FOOD.getTitle()));
     }
@@ -136,29 +154,38 @@ public class ProductTests {
 
     @Test
     void deleteProductTest() throws IOException {
+        Integer countProductBefore = DBUtils.countProducts(productsMapper);
         Integer id = postProductTest();
         Response<ResponseBody> response = productService
                 .deleteProduct(id)
                 .execute();
         prettyLogger.log(response.body().toString());
+        Integer countProductAfter = DBUtils.countProducts(productsMapper);
+        assertThat(countProductAfter, equalTo(countProductBefore - 1));
         assertThat(response.isSuccessful(), is(true));
     }
 
     @Test
     void deleteNonExistProductTest() throws IOException {
+        Integer countProductBefore = DBUtils.countProducts(productsMapper);
         Integer id = (int) ((Math.random() + 1) * 1000000);
         Response<ResponseBody> response = productService
                 .deleteProduct(id)
                 .execute();
+        Integer countProductAfter = DBUtils.countProducts(productsMapper);
+        assertThat(countProductAfter, equalTo(countProductBefore));
         assertThat(response.isSuccessful(), is(false));
     }
 
     @Test
     void deleteNullProductTest() throws IOException {
+        Integer countProductBefore = DBUtils.countProducts(productsMapper);
         Integer id = 0;
         Response<ResponseBody> response = productService
                 .deleteProduct(id)
                 .execute();
+        Integer countProductAfter = DBUtils.countProducts(productsMapper);
+        assertThat(countProductAfter, equalTo(countProductBefore));
         assertThat(response.isSuccessful(), is(false));
     }
 }
