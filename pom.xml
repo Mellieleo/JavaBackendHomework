@@ -34,10 +34,10 @@
                         <allure.results.directory>target/allure-results</allure.results.directory>
                     </systemPropertyVariables>
                     <testFailureIgnore>true</testFailureIgnore>
-                    <argLine>
-                        -DFile.encoding=UTF-8
-                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjveawer/${aspectjversion}/aspectjveawer-${aspectjversion}.jar
-                    </argLine>
+<!--                    <argLine>-->
+<!--                        -DFile.encoding=UTF-8-->
+<!--                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjveawer/${aspectjversion}/aspectjveawer-${aspectjversion}.jar"-->
+<!--                    </argLine>-->
                 </configuration>
             </plugin>
         </plugins>
@@ -46,14 +46,45 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>${aspectjversion}</version>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>4.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.1</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>20030203.000550</version>
+            <version>2.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.22</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectjversion}</version>
         </dependency>
         <dependency>
             <groupId>io.qameta.allure</groupId>
@@ -74,16 +105,6 @@
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-rest-assured</artifactId>
             <version>2.15.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.8.1</version>
-        </dependency>
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>4.4.0</version>
         </dependency>
     </dependencies>
 
